@@ -39,3 +39,5 @@ next-env.d.ts
 # local SQLite persistence (parse results for this machine only)
 /.graph/
 docs/
+.worktrees/
+graph-experiments/
