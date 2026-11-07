@@ -10,7 +10,7 @@
     "parse": "node scripts/parse.ts",
     "map-counts": "node scripts/map-counts.ts",
     "insights": "node scripts/insights.ts",
-    "test": "node fixtures/scorer.test.ts",
+    "test": "node fixtures/scorer.test.ts && node packages/core/core.test.ts",
     "generate-fixtures": "node fixtures/generate.ts --strict"
   },
   "dependencies": {
