@@ -3,7 +3,7 @@ import { Project } from "ts-morph";
 import { roleAt, refineScopes } from "./roleat.ts";
 function assert(c: boolean, m: string) { if (!c) { console.error("FAIL:", m); process.exit(1); } }
 const project = new Project({ useInMemoryFileSystem: true });
-const sf = project.createSourceFile("test.ts", `
+const sf = project.createSourceFile("test.tsx", `
 import { x } from "./x";
 export class C {
   get = () => { helper(); };
