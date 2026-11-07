@@ -1,0 +1,12 @@
+import "./notifier";
+import express from "express";
+import { buildRouter } from "./routes";
+import { UserController } from "./controllers/userController";
+import { OrderController } from "./controllers/orderController";
+import { UserService } from "./services/userService";
+import { OrderService } from "./services/orderService";
+import { UserRepository } from "./repositories/userRepository";
+const app = express();
+const userService = new UserService(new UserRepository());
+app.use("/api", buildRouter(new UserController(userService), new OrderController(new OrderService(userService))));
+app.listen(3000);
