@@ -9,7 +9,9 @@
     "lint": "eslint",
     "parse": "node scripts/parse.ts",
     "map-counts": "node scripts/map-counts.ts",
-    "insights": "node scripts/insights.ts"
+    "insights": "node scripts/insights.ts",
+    "test": "node fixtures/scorer.test.ts",
+    "generate-fixtures": "node fixtures/generate.ts --strict"
   },
   "dependencies": {
     "@dagrejs/dagre": "^3.1.1",
