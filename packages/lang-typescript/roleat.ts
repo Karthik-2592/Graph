@@ -12,7 +12,7 @@ export function roleAt(source: SourceFile, line: number, col: number): Role {
   let node: import("ts-morph").Node | undefined;
   let bestLen = Infinity;
   for (const d of source.getDescendants()) {
-    if (d.getStart() <= pos && pos <= d.getEnd() && d.getEnd() - d.getStart() < bestLen) { bestLen = d.getEnd() - d.getStart(); node = d; }
+    if (d.getStart() <= pos && pos < d.getEnd() && d.getEnd() - d.getStart() < bestLen) { bestLen = d.getEnd() - d.getStart(); node = d; }
   }
   if (!node) return "reference";
   if (node.getFirstAncestorByKind(SyntaxKind.JsxOpeningElement) || node.getFirstAncestorByKind(SyntaxKind.JsxSelfClosingElement) || node.getFirstAncestorByKind(SyntaxKind.JsxExpression)) {
