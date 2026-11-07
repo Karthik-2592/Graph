@@ -7,7 +7,8 @@ export type ScopeSpan = { start: number; end: number; nodeId: string; kind: "pro
 
 /** Classify the token at (line, col) — call | new | jsx | decorator | reference | type. */
 export function roleAt(source: SourceFile, line: number, col: number): Role {
-  const pos = source.getText().split("\n").slice(0, line).reduce((acc, l) => acc + l.length + 1, 0) + col;
+  // getFullText (not getText, which drops leading trivia and shifts lines).
+  const pos = source.getFullText().split("\n").slice(0, line).reduce((acc, l) => acc + l.length + 1, 0) + col;
   // Smallest descendant containing pos (ts-morph has no getNodeAtPos).
   let node: import("ts-morph").Node | undefined;
   let bestLen = Infinity;
