@@ -19,6 +19,7 @@
     "@scip-code/scip": "0.10.0",
     "@sourcegraph/scip-typescript": "0.6.1",
     "@xyflow/react": "^12.12.0",
+    "elkjs": "0.12.1",
     "next": "16.3.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
