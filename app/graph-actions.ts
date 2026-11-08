@@ -10,7 +10,6 @@ import { createRun, upsertNodes, upsertEdges, insertSites, setCoverage, transact
 import { parseResultToGraph } from "@/packages/lang-typescript/ts-imports";
 import { l1ViewerGraph, l2ViewerGraph, neighbourhood, type ViewerNode, type ViewerEdge } from "@/packages/core/view";
 import { runPipeline } from "@/packages/core/pipeline";
-import { parseResultToGraph } from "@/packages/lang-typescript/ts-imports";
 
 export type GraphLevel = { nodes: ViewerNode[]; edges: ViewerEdge[]; note: string };
 
