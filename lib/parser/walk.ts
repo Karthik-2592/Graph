@@ -5,7 +5,22 @@ import { fallbackAdapter } from "./adapters/fallback.ts";
 import { selectAdapter, type FrameworkAdapter } from "./adapters/index.ts";
 import type { ExcludedDirectory, Project, SkippedFile } from "./types.ts";
 
-export const CODE_EXTENSIONS = [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"];
+export const CODE_EXTENSIONS = [
+  // TypeScript / JavaScript
+  ".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs",
+  // Python (Phase 6)
+  ".py", ".pyi",
+  // Go (Phase 7)
+  ".go",
+  // Rust (U4)
+  ".rs",
+  // Java / Kotlin (U4)
+  ".java", ".kt", ".kts",
+  // C# (U4)
+  ".cs",
+  // C / C++ (U4, needs compile_commands.json for accuracy)
+  ".c", ".h", ".cc", ".cpp", ".hpp", ".cxx",
+];
 const DECLARATION = /\.d\.(ts|mts|cts)$|\.d\.[^/.]+\.ts$/;
 
 // Generated bundles and vendored blobs run past this; hand-written modules don't.

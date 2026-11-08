@@ -12,6 +12,8 @@ import { checkGates, coverageReport } from "../core/gates.ts";
 import { doctorReport } from "./doctor.ts";
 import { loadConfig } from "./config.ts";
 import { toDot, toJson, toGraphMl } from "./export.ts";
+import { detectPythonFiles, hasScipPython } from "../lang-python/wire.ts";
+import { runPythonCore } from "../lang-python/runner2.ts";
 
 function dbPath(root: string) {
   const dir = path.join(root, ".graph");
@@ -26,6 +28,24 @@ export function indexRepo(root: string, mode = "lenient"): number {
   const runId = createRun(db, { root: result.root, mode });
   const v5 = parseResultToGraph(result);
   transaction(db, () => { upsertNodes(db, runId, v5.nodes); upsertEdges(db, runId, v5.edges); insertSites(db, runId, v5.sites); setCoverage(db, runId, v5.coverage); });
+  // Python wiring: if .py files exist and scip-python is available, index
+  // them through the shared core; otherwise record a producer site.
+  const pyFiles = detectPythonFiles(root);
+  if (pyFiles.length > 0) {
+    if (hasScipPython()) {
+      try {
+        const py = runPythonCore(root, path.join(root, ".graph", "python.scip"));
+        transaction(db, () => { upsertNodes(db, runId, py.nodes); upsertEdges(db, runId, py.edges); insertSites(db, runId, py.sites); });
+        setCoverage(db, runId, { "producer:scip-python": "ran", "python.files": String(pyFiles.length) });
+      } catch (e) {
+        insertSites(db, runId, [{ kind: "file-outside-program", status: "unrecognized", path: root, reason: `scip-python failed: ${e instanceof Error ? e.message : String(e)}` }]);
+        setCoverage(db, runId, { "producer:scip-python": "failed" });
+      }
+    } else {
+      insertSites(db, runId, [{ kind: "file-outside-program", status: "unrecognized", path: root, reason: `scip-python not on PATH — ${pyFiles.length} Python file(s) not indexed` }]);
+      setCoverage(db, runId, { "producer:scip-python": "skipped" });
+    }
+  }
   return runId;
 }
 
