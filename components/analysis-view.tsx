@@ -9,6 +9,7 @@ import { clampOffset, groupId, MAX_ROWS, rankGroupFiles } from "@/lib/graph/view
 import type { Coverage, Edge, ParsedFile, Route } from "@/lib/parser/types";
 import { CategoryRail } from "./category-rail";
 import { CoveragePanel } from "./coverage-panel";
+import { GraphLevels } from "./graph-levels";
 import { DetailPane, type RepositoryFacts } from "./detail-pane";
 import { DependencyMap } from "./map/dependency-map";
 import { RouteTable } from "./route-table";
@@ -24,6 +25,7 @@ export function AnalysisView({
   routes,
   routeCoverage,
   coverage,
+  analysisId,
   repository,
 }: {
   files: ParsedFile[];
@@ -31,6 +33,7 @@ export function AnalysisView({
   routes: Route[];
   routeCoverage: Coverage["routes"];
   coverage: Coverage;
+  analysisId?: string;
   repository: Omit<RepositoryFacts, "routes">;
 }) {
   const [level, setLevel] = useState<"folded" | "all">("folded");
@@ -57,7 +60,7 @@ export function AnalysisView({
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
   // The centre column shows the map, route table, coverage, or call flow.
-  const [centre, setCentre] = useState<"map" | "routes" | "coverage" | "flow">("map");
+  const [centre, setCentre] = useState<"map" | "routes" | "coverage" | "flow" | "graph">("map");
   // Call-flow mode: entry point + depth, expanded with reach() arithmetic.
   const [flowEntry, setFlowEntry] = useState<string>("");
   const [flowDepth, setFlowDepth] = useState(2);
@@ -149,6 +152,7 @@ export function AnalysisView({
             <CentreTab label="Routes" count={routes.length} on={centre === "routes"} onClick={() => setCentre("routes")} />
             <CentreTab label="Coverage" count={coverage.imports.unresolved.length} on={centre === "coverage"} onClick={() => setCentre("coverage")} />
             <CentreTab label="Flow" on={centre === "flow"} onClick={() => setCentre("flow")} />
+            <CentreTab label="Graph" on={centre === "graph"} onClick={() => setCentre("graph")} />
             <span className="ml-auto flex items-center gap-1 pb-1">
               <button type="button" className={level === "folded" ? "text-fg" : "text-fg-muted"} onClick={() => setLevel("folded")}>Folded</button>
               <span className="text-fg-muted">/</span>
@@ -186,6 +190,7 @@ export function AnalysisView({
               />
             )}
             {centre === "coverage" && <CoveragePanel coverage={coverage} onReveal={reveal} />}
+            {centre === "graph" && analysisId && <GraphLevels analysisId={analysisId} />}
             {centre === "flow" && (
               <div className="h-full overflow-auto p-3 text-[12px]">
                 <h2 className="mb-2 font-mono text-[11px] uppercase tracking-wide text-fg-muted">Call flow (file level)</h2>

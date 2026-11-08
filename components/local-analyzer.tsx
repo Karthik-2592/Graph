@@ -88,6 +88,7 @@ export function LocalAnalyzer({ saved }: { saved: AnalysisSummary[] }) {
               routes={current.result.routes}
               routeCoverage={current.result.coverage.routes}
               coverage={current.result.coverage}
+              analysisId={current.id}
               repository={{
                 name: current.result.root,
                 projects: current.result.projects,
