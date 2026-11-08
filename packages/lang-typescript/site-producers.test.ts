@@ -2,7 +2,7 @@
 import { newProject, produceSites, fileOutsideProgram } from "./site-producers.ts";
 function assert(c: boolean, m: string) { if (!c) { console.error("FAIL:", m); process.exit(1); } }
 const p = newProject();
-const sf = p.createSourceFile("t.ts", `import "./setup";\nimport("./x");\nfetch("/api");\nbus.emit("ok");\nbus.emit(name);\n`);
+const sf = p.createSourceFile("t.ts", `import "./setup";\nimport(name);\nfetch("/api");\nbus.emit("ok");\nbus.emit(name);\n`);
 const sites = produceSites(sf, "t.ts");
 assert(sites.some((s) => s.kind === "side-effect-import"), "G3 side-effect import");
 assert(sites.some((s) => s.kind === "dynamic-import"), "G2 non-literal import");
