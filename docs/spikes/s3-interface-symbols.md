@@ -13,6 +13,12 @@ the protocol, and the protocol text answers it completely.
    way to tell whether a symbol is "a class or a method" — the proto
    explicitly says to use it "instead of `SymbolDescriptor.Suffix`".
 
+   **Correction (2026-11-08, verified against real index output):**
+   TypeScript interface methods arrive as kind **26 (`Method`)**, not
+   66. `Stripe#charge()` → `Gateway#charge()` carries an
+   `is_implementation` relationship (`[impl]`), so dispatch detection
+   (E3 g) must key off *relationships*, not the method's own kind.
+
 2. **Implementation relationships exist.** `SymbolInformation.relationships`
    is `repeated Relationship`, and `Relationship` has:
    - `is_reference` — "Find references" linkage
