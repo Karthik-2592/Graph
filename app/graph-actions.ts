@@ -9,8 +9,25 @@ import { openDb, migrate } from "@/packages/core/db";
 import { createRun, upsertNodes, upsertEdges, insertSites, setCoverage, transaction } from "@/packages/core/store";
 import { parseResultToGraph } from "@/packages/lang-typescript/ts-imports";
 import { l1ViewerGraph, l2ViewerGraph, neighbourhood, type ViewerNode, type ViewerEdge } from "@/packages/core/view";
+import { runPipeline } from "@/packages/core/pipeline";
+import { parseResultToGraph } from "@/packages/lang-typescript/ts-imports";
 
 export type GraphLevel = { nodes: ViewerNode[]; edges: ViewerEdge[]; note: string };
+
+/** v5 path: runPipeline (B1) — the app no longer rebuilds from v4 blobs
+ *  ad hoc; it triggers the orchestrator with a cache key (B3). */
+export async function indexViaPipeline(analysisId: string): Promise<{ runId: number } | { error: string }> {
+  try {
+    const result = loadAnalysis(analysisId);
+    if (!result) return { error: "analysis not found" };
+    const out = runPipeline({
+      root: result.root,
+      dbFile: `:memory:`,
+      importNodes: () => parseResultToGraph(result),
+    });
+    return { runId: out.runId };
+  } catch (e) { return { error: e instanceof Error ? e.message : String(e) }; }
+}
 
 function buildRun(analysisId: string): { db: ReturnType<typeof openDb>; runId: number } | null {
   const result = loadAnalysis(analysisId);
