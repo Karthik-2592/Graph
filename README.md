@@ -1,71 +1,83 @@
 # Graph
 
-Graph turns a TypeScript or JavaScript project on your own machine into an
-interactive dependency map. It parses the real source files — imports,
-re-exports, dynamic imports, and `require()` calls — into nodes and edges, and
-lets you explore the shape of the codebase directly on the canvas.
-
-Every box and every line comes from parsing the code. There is no model
-guessing at structure, and nothing leaves the machine: no accounts, no
-uploads, no API keys. Parse results persist in a local SQLite file
-(`.graph/graph.db`) so a map can be reopened without re-parsing —
-but the database never leaves this machine either.
+Graph turns a TypeScript, JavaScript, Python, or Go project on your own
+machine into an interactive dependency map — files, then functions.
+Every box and every line comes from really parsing the code (SCIP
+indexers + AST passes). No model guesses at structure, nothing leaves
+the machine: no accounts, no uploads, no API keys.
 
 ## Tech stack
 
-- **Next.js 16** — App Router UI and the server action that runs the parser.
+- **Next.js 16** — App Router UI and server actions.
 - **TypeScript 5** — strict types across the app and parser.
-- **ts-morph** — parses source files into deterministic AST graph structures.
-- **React Flow (@xyflow/react)** + **dagre** — the interactive canvas and its layout.
-- **SQLite** (Node's built-in `node:sqlite`, no extra dependency) — stores
-  parse results in `.graph/graph.db` for reopening later.
-- **Tailwind CSS v4** — the dense, high-information developer interface.
+- **ts-morph** — AST parsing for the file graph (L1) and `roleAt` classification.
+- **SCIP** (`@sourcegraph/scip-typescript`, `@scip-code/scip` protobuf
+  bindings) — function/class call flow (L2).
+- **React Flow (@xyflow/react)** + **dagre** (instant) and **ELK**
+  (scales to thousands of nodes) — the canvas.
+- **SQLite** (Node's built-in `node:sqlite`) — normalized v5 store
+  (`runs`/`nodes`/`edges`/`sites`/`coverage`) in `.graph/graph.db`;
+  legacy v4 parses load through a converter.
+- **Tailwind CSS v4** — dense developer UI.
 
 ## Features
 
-- **Local AST parsing**: point Graph at any directory on this machine; it
-  walks and parses the TypeScript/JavaScript files in place.
-- **Interactive canvas mapping**: zoom, expand folders into individual files,
-  select modules, and view connected incoming and outgoing dependencies.
-- **Blast radius & dependency chain**: arithmetic over the parsed edge list —
-  what breaks if a file changes, and what a file transitively depends on.
-- **Category rail**: files grouped by the role their framework's conventions
-  give them (page routes, API endpoints, services, components, tests, …),
-  with an unclassified bucket for everything else.
-- **Route table**: routes whose method and full path are both written in the
-  code, with omitted/withheld routes reported, never guessed.
-- **Insights**: unimported files, heavily imported files, import loops, and
-  long files — facts computed from the graph, in the browser, instantly.
-- **Coverage reporting**: what was parsed, what was skipped and why, and every
-  unresolved import.
+- **Local parsing**: point Graph at any directory; imports, re-exports,
+  dynamic imports, and `require()` become edges. Nothing uploaded.
+- **Two zoom levels**: L1 file/package dependencies, L2 function/class
+  call flow — both projections of one graph, with provenance per edge.
+- **Interactive canvas**: hierarchical folding, ELK layout, level toggle,
+  call-flow mode (entry point + depth), coverage panel, blast radius.
+- **Lenient/strict dial**: index anything and report unresolved sites
+  (`graph check --strict` fails on gates G1–G8 for rule-compliant repos).
+- **Extractors**: event buses, shared route contracts, and handler tables
+  become first-class `event`/`route` nodes — dynamic links SCIP alone misses.
+- **Category rail**: files grouped by framework-convention roles, with an
+  unclassified bucket for everything else.
+- **Route table, insights, coverage**: routes with exact method+path only,
+  unimported/hot/loop/long-file facts, and what was skipped and why —
+  all arithmetic over data already in the browser, no spinners.
+- **Multi-language plugin contract**: TypeScript complete; Python and Go
+  runners in `packages/lang-python` / `packages/lang-go`; incremental
+  re-indexing by per-file hash.
 
 ## Quick start
 
-Prerequisites: Node.js and npm.
+Prerequisites: Node.js (≥ 22.5 for `node:sqlite`), npm. For SCIP
+indexing, install the indexer:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), enter the path to a
-project on this machine (for example `C:\path\to\repository`), and press
-**Parse**. The result is shown immediately and saved to the local SQLite
-database; the **Saved parses** panel on the right reopens any earlier parse
-without re-parsing, and deletes it from the database when asked. Set
-`GRAPH_DB_PATH` to store the database somewhere else. The database file
-is gitignored and never leaves this machine.
+Open [http://localhost:3000](http://localhost:3000), enter a local
+directory path, press **Parse**. Saved parses reopen from the local
+SQLite database (`GRAPH_DB_PATH` overrides the location).
 
-## Parser from the command line
-
-The parser is standalone: it takes a directory and returns files, edges, and a
-coverage report, with nothing else running.
+## CLI
 
 ```bash
-npm run parse <dir>                 # print a summary
-npm run parse <dir> --out out.json  # write the full result
-npm run parse --read out.json       # validate a written result
-npm run parse <dir> --all           # list every unresolved import
-npm run insights out.json           # insights + reach checks
-npm run map-counts out.json         # canvas node/edge counts
+graph index <repo> [--strict]              # parse + write .graph/graph.db
+graph check <repo> [--strict] [--fail-on=G1,G4]
+graph callers|callees <node-id> [--depth=2]
+graph path <a> <b>
+graph coverage <repo>                      # sites by status/kind (JSON)
+graph export <repo> --level=1|2 --format=json|dot|graphml
+graph doctor                               # Node, indexer, deps, root program
 ```
+
+Legacy parser scripts still work: `npm run parse|insights|map-counts`.
+
+## Development
+
+```bash
+npm test          # fixture scorer + all package tests
+```
+
+Fixtures (`fixtures/shop`, `shop-strict`, `shop-dynamic`) are generated
+from the experiment artifacts: `npm run generate-fixtures`. The shop
+fixture scores **calls 28/28, renders 6/6, instantiates 7/7, 0 false
+edges** against `fixtures/truth/shop.json`. Spike decisions live in
+`docs/spikes/` (SCIP reading, performance budgets, workspace layouts,
+viewer stack). The implementation plan is `docs/graph-implementation-plan.md`.
