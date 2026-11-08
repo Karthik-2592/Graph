@@ -39,5 +39,8 @@
   "bin": {
     "graph": "node packages/cli/main.ts"
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=22.5"
+  }
 }
