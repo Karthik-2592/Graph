@@ -10,5 +10,4 @@ export class OrderService {
     bus.emit("orderPlaced", { total });
     return { user: u.name, total, display: formatMoney(total) };
   }
-  }
 }

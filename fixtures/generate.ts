@@ -61,7 +61,7 @@ export function applyStrict(files: { path: string; content: string }[]): { path:
   // Remove the non-literal emit site (replay)
   set("backend/src/services/orderService.ts", get("backend/src/services/orderService.ts").replace(
     '\n  }\n  replay(k: "orderPlaced" | "userRenamed") {\n    bus.emit(k as any, {} as any);',
-    "\n  }",
+    "\n",
   ));
   // Remove loose (string-keyed, cast) dispatch — only typed dispatch remains
   set("backend/src/commands.ts", get("backend/src/commands.ts").replace(
