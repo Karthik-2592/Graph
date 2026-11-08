@@ -8,7 +8,7 @@ export function CoveragePanel({ coverage, onReveal }: { coverage: Coverage; onRe
   const { files, imports } = coverage;
   const total = imports.total;
   return (
-    <div className="h-full overflow-auto p-3 text-[12px]">
+    <div className="absolute inset-0 overflow-auto bg-surface p-3 text-[12px]">
       <h2 className="mb-2 font-mono text-[11px] uppercase tracking-wide text-fg-muted">Coverage</h2>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
         <dt className="text-fg-muted">Files found</dt><dd className="text-right tabular-nums">{files.found}</dd>

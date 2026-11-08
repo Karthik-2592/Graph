@@ -27,7 +27,7 @@ export function GraphLevels({ analysisId }: { analysisId: string }) {
 
   if (error) return <div className="p-3 text-xs text-red-600">{error}</div>;
   return (
-    <div className="flex h-full flex-col">
+    <div className="absolute inset-0 flex flex-col bg-surface">
       <div className="flex items-center gap-2 border-b border-line bg-surface px-3 py-1 text-[11px]">
         <button type="button" className={level === "l1" ? "text-fg" : "text-fg-muted"} onClick={() => setLevel("l1")}>L1 · Files</button>
         <span className="text-fg-muted">/</span>

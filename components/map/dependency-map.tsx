@@ -90,14 +90,15 @@ function MapCanvas({
   // Dagre gives an instant layout; ELK (Task 12: wins at scale) upgrades it
   // asynchronously. Until ELK resolves — or if it times out — dagre stands.
   const dagreBoxes = useMemo(() => layout(view.objects, view.edges), [view]);
-  const [elkBoxes, setElkBoxes] = useState<Map<string, { x: number; y: number; width: number; height: number }> | null>(null);
+  // ELK boxes are keyed to the exact view they were computed for; stale
+  // boxes from a previous view must never be used (missing dir:. crash).
+  const [elkState, setElkState] = useState<{ view: typeof view; boxes: Map<string, { x: number; y: number; width: number; height: number }> } | null>(null);
   useEffect(() => {
     let cancelled = false;
-    setElkBoxes(null);
-    import("./elk-layout").then(({ layoutElk }) => layoutElk(view.objects, view.edges).then((b) => { if (!cancelled) setElkBoxes(b); }).catch(() => { /* dagre fallback stands */ }));
+    import("./elk-layout").then(({ layoutElk }) => layoutElk(view.objects, view.edges).then((b) => { if (!cancelled) setElkState({ view, boxes: b }); }).catch(() => { /* dagre fallback stands */ }));
     return () => { cancelled = true; };
   }, [view]);
-  const boxes = elkBoxes ?? dagreBoxes;
+  const boxes = elkState?.view === view ? elkState.boxes : dagreBoxes;
   const lit = useMemo(() => highlightFor(view, edges, selection), [view, edges, selection]);
   const hovered = useMemo(() => hoverEndpoint(view, hover), [view, hover]);
   const railKeys = useMemo(
@@ -242,10 +243,18 @@ function MapCanvas({
   useEffect(() => {
     if (refitted.current === refit) return;
     refitted.current = refit;
+    // Focus the selected node instead of fitting the whole graph: fitting
+    // everything on every reveal made focusing reset the view to poster size.
+    const sel = selection?.kind === "file" ? boxes.get(`dir:${folding.groupOf.get(selection.path) ?? "."}`) : selection?.kind === "group" ? boxes.get(selection.id) : undefined;
+    if (sel) {
+      const zoom = Math.max(getZoom(), 0.8);
+      setViewport({ x: width / 2 - (sel.x + sel.width / 2) * zoom, y: height / 2 - (sel.y + sel.height / 2) * zoom, zoom });
+      return;
+    }
     // Capping at the current zoom means this can only ever zoom out: fitting
     // everything including the new panel, never zooming into the panel.
     setViewport(getViewportForBounds(boundsOf(boxes), width, height, MIN_ZOOM, getZoom(), FIT_PADDING));
-  }, [refit, boxes, width, height, getZoom, setViewport]);
+  }, [refit, boxes, width, height, getZoom, setViewport, selection, folding]);
 
   const actions = useMemo(
     () => ({ close: onClose, selectFile: onSelectFile, scroll: onScroll, hover: onHover }),

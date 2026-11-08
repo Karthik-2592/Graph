@@ -192,7 +192,7 @@ export function AnalysisView({
             {centre === "coverage" && <CoveragePanel coverage={coverage} onReveal={reveal} />}
             {centre === "graph" && analysisId && <GraphLevels analysisId={analysisId} />}
             {centre === "flow" && (
-              <div className="h-full overflow-auto p-3 text-[12px]">
+              <div className="absolute inset-0 overflow-auto bg-surface p-3 text-[12px]">
                 <h2 className="mb-2 font-mono text-[11px] uppercase tracking-wide text-fg-muted">Call flow (file level)</h2>
                 <div className="mb-3 flex gap-2">
                   <select aria-label="Entry point" className="rounded border border-line bg-surface px-1 py-0.5" value={flowEntry} onChange={(e) => setFlowEntry(e.target.value)}>
