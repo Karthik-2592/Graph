@@ -9,8 +9,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export type EdgePair = [string, string];
-export type Truth = { calls: EdgePair[]; renders: EdgePair[]; dynamic?: Record<string, EdgePair[]> };
-export type Extracted = Partial<{ calls: EdgePair[]; renders: EdgePair[]; dynamic: Record<string, EdgePair[]> }>;
+export type Truth = { calls: EdgePair[]; renders: EdgePair[]; instantiates?: EdgePair[]; dynamic?: Record<string, EdgePair[]> };
+export type Extracted = Partial<{ calls: EdgePair[]; renders: EdgePair[]; instantiates: EdgePair[]; dynamic: Record<string, EdgePair[]> }>;
 
 const key = (e: EdgePair) => `${e[0]}\0${e[1]}`;
 const toSet = (edges: EdgePair[]) => new Set(edges.map(key));
@@ -37,6 +37,7 @@ export function score(truth: Truth, extracted: Extracted): Record<string, KindSc
   const out: Record<string, KindScore> = {
     calls: scoreKind(truth.calls, extracted.calls ?? []),
     renders: scoreKind(truth.renders, extracted.renders ?? []),
+    instantiates: scoreKind(truth.instantiates ?? [], extracted.instantiates ?? []),
   };
   for (const [kind, pairs] of Object.entries(truth.dynamic ?? {})) {
     out[`dynamic.${kind}`] = scoreKind(pairs, extracted.dynamic?.[kind] ?? []);

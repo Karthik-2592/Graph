@@ -1,60 +1,208 @@
 {
   "calls": [
-    ["backend/src/utils/pricing.ts::calculateTotal().", "backend/src/utils/pricing.ts::applyDiscount()."],
-    ["backend/src/utils/pricing.ts::calculateTotal().", "backend/src/utils/pricing.ts::lineTotal()."],
-    ["backend/src/services/userService.ts::UserService#findById().", "backend/src/repositories/userRepository.ts::UserRepository#find()."],
-    ["backend/src/services/userService.ts::UserService#findById().", "backend/src/errors.ts::NotFound#"],
-    ["backend/src/services/userService.ts::UserService#rename().", "backend/src/services/userService.ts::UserService#findById()."],
-    ["backend/src/services/userService.ts::UserService#rename().", "backend/src/repositories/userRepository.ts::UserRepository#save()."],
-    ["backend/src/services/userService.ts::UserService#rename().", "backend/src/services/userService.ts::UserService#normalize()."],
-    ["backend/src/services/orderService.ts::OrderService#place().", "backend/src/services/userService.ts::UserService#findById()."],
-    ["backend/src/services/orderService.ts::OrderService#place().", "backend/src/utils/pricing.ts::calculateTotal()."],
-    ["backend/src/services/orderService.ts::OrderService#place().", "shared/scripts/format.ts::formatMoney()."],
-    ["backend/src/controllers/userController.ts::UserController#get.", "shared/DTOs/user.ts::toUserDTO()."],
-    ["backend/src/controllers/userController.ts::UserController#get.", "backend/src/services/userService.ts::UserService#findById()."],
-    ["backend/src/controllers/userController.ts::UserController#rename().", "backend/src/services/userService.ts::UserService#rename()."],
-    ["backend/src/controllers/userController.ts::UserController#rename().", "shared/DTOs/user.ts::toUserDTO()."],
-    ["backend/src/controllers/orderController.ts::OrderController#place().", "backend/src/services/orderService.ts::OrderService#place()."],
-    ["backend/src/middleware/auth.ts::requireAuth().", "backend/src/middleware/auth.ts::isAuthed()."],
-    ["backend/src/routes/index.ts::buildRouter().", "backend/src/controllers/userController.ts::UserController#rename()."],
-    ["frontend/src/api/client.ts::getUser().", "frontend/src/api/client.ts::fetchJson()."],
-    ["frontend/src/api/client.ts::placeOrder().", "frontend/src/api/client.ts::fetchJson()."],
-    ["frontend/src/hooks/useUser.ts::useUser().", "frontend/src/api/client.ts::getUser()."],
-    ["frontend/src/components/UserCard.tsx::UserCard().", "shared/scripts/format.ts::formatMoney()."],
-    ["frontend/src/components/OrderList.tsx::OrderRow().", "shared/scripts/format.ts::formatMoney()."],
-    ["frontend/src/pages/UserPage.tsx::UserPage().", "frontend/src/hooks/useUser.ts::useUser()."],
-    ["frontend/src/pages/OrdersPage.tsx::OrdersPage().", "frontend/src/api/client.ts::placeOrder()."],
-    ["shared/scripts/format.ts::formatMoney().", "shared/scripts/format.ts::pad()."],
-    ["tests/pricing.test.ts::", "backend/src/utils/pricing.ts::calculateTotal()."],
-    ["tests/pricing.test.ts::", "shared/scripts/format.ts::formatMoney()."],
-    ["tests/userService.test.ts::", "backend/src/services/userService.ts::UserService#"],
-    ["backend/src/index.ts::", "backend/src/routes/index.ts::buildRouter()."],
-    ["backend/src/index.ts::", "backend/src/controllers/userController.ts::UserController#"],
-    ["backend/src/index.ts::", "backend/src/controllers/orderController.ts::OrderController#"],
-    ["backend/src/index.ts::", "backend/src/services/userService.ts::UserService#"],
-    ["backend/src/index.ts::", "backend/src/services/orderService.ts::OrderService#"],
-    ["backend/src/index.ts::", "backend/src/repositories/userRepository.ts::UserRepository#"]
+    [
+      "backend/src/utils/pricing.ts::calculateTotal().",
+      "backend/src/utils/pricing.ts::applyDiscount()."
+    ],
+    [
+      "backend/src/utils/pricing.ts::calculateTotal().",
+      "backend/src/utils/pricing.ts::lineTotal()."
+    ],
+    [
+      "backend/src/services/userService.ts::UserService#findById().",
+      "backend/src/repositories/userRepository.ts::UserRepository#find()."
+    ],
+    [
+      "backend/src/services/userService.ts::UserService#rename().",
+      "backend/src/services/userService.ts::UserService#findById()."
+    ],
+    [
+      "backend/src/services/userService.ts::UserService#rename().",
+      "backend/src/repositories/userRepository.ts::UserRepository#save()."
+    ],
+    [
+      "backend/src/services/userService.ts::UserService#rename().",
+      "backend/src/services/userService.ts::UserService#normalize()."
+    ],
+    [
+      "backend/src/services/orderService.ts::OrderService#place().",
+      "backend/src/services/userService.ts::UserService#findById()."
+    ],
+    [
+      "backend/src/services/orderService.ts::OrderService#place().",
+      "backend/src/utils/pricing.ts::calculateTotal()."
+    ],
+    [
+      "backend/src/services/orderService.ts::OrderService#place().",
+      "shared/scripts/format.ts::formatMoney()."
+    ],
+    [
+      "backend/src/controllers/userController.ts::UserController#get.",
+      "shared/DTOs/user.ts::toUserDTO()."
+    ],
+    [
+      "backend/src/controllers/userController.ts::UserController#get.",
+      "backend/src/services/userService.ts::UserService#findById()."
+    ],
+    [
+      "backend/src/controllers/userController.ts::UserController#rename().",
+      "backend/src/services/userService.ts::UserService#rename()."
+    ],
+    [
+      "backend/src/controllers/userController.ts::UserController#rename().",
+      "shared/DTOs/user.ts::toUserDTO()."
+    ],
+    [
+      "backend/src/controllers/orderController.ts::OrderController#place().",
+      "backend/src/services/orderService.ts::OrderService#place()."
+    ],
+    [
+      "backend/src/middleware/auth.ts::requireAuth().",
+      "backend/src/middleware/auth.ts::isAuthed()."
+    ],
+    [
+      "backend/src/routes/index.ts::buildRouter().",
+      "backend/src/controllers/userController.ts::UserController#rename()."
+    ],
+    [
+      "frontend/src/api/client.ts::getUser().",
+      "frontend/src/api/client.ts::fetchJson()."
+    ],
+    [
+      "frontend/src/api/client.ts::placeOrder().",
+      "frontend/src/api/client.ts::fetchJson()."
+    ],
+    [
+      "frontend/src/hooks/useUser.ts::useUser().",
+      "frontend/src/api/client.ts::getUser()."
+    ],
+    [
+      "frontend/src/components/UserCard.tsx::UserCard().",
+      "shared/scripts/format.ts::formatMoney()."
+    ],
+    [
+      "frontend/src/components/OrderList.tsx::OrderRow().",
+      "shared/scripts/format.ts::formatMoney()."
+    ],
+    [
+      "frontend/src/pages/UserPage.tsx::UserPage().",
+      "frontend/src/hooks/useUser.ts::useUser()."
+    ],
+    [
+      "frontend/src/pages/OrdersPage.tsx::OrdersPage().",
+      "frontend/src/api/client.ts::placeOrder()."
+    ],
+    [
+      "shared/scripts/format.ts::formatMoney().",
+      "shared/scripts/format.ts::pad()."
+    ],
+    [
+      "tests/pricing.test.ts::<module-init>",
+      "backend/src/utils/pricing.ts::calculateTotal()."
+    ],
+    [
+      "tests/pricing.test.ts::<module-init>",
+      "shared/scripts/format.ts::formatMoney()."
+    ],
+    [
+      "backend/src/index.ts::<module-init>",
+      "backend/src/routes/index.ts::buildRouter()."
+    ],
+    [
+      "backend/src/repositories/userRepository.ts::UserRepository#store.",
+      "backend/src/db/index.ts::connect()."
+    ]
   ],
   "renders": [
-    ["frontend/src/components/UserCard.tsx::UserCard().", "frontend/src/components/ui/Button.tsx::Button()."],
-    ["frontend/src/components/OrderList.tsx::OrderList().", "frontend/src/components/OrderList.tsx::OrderRow()."],
-    ["frontend/src/pages/UserPage.tsx::UserPage().", "frontend/src/components/UserCard.tsx::UserCard()."],
-    ["frontend/src/pages/OrdersPage.tsx::OrdersPage().", "frontend/src/components/OrderList.tsx::OrderList()."],
-    ["frontend/src/main.tsx::", "frontend/src/pages/UserPage.tsx::UserPage()."]
+    [
+      "frontend/src/components/UserCard.tsx::UserCard().",
+      "frontend/src/components/ui/Button.tsx::Button()."
+    ],
+    [
+      "frontend/src/components/OrderList.tsx::OrderList().",
+      "frontend/src/components/OrderList.tsx::OrderRow()."
+    ],
+    [
+      "frontend/src/pages/UserPage.tsx::UserPage().",
+      "frontend/src/components/UserCard.tsx::UserCard()."
+    ],
+    [
+      "frontend/src/pages/OrdersPage.tsx::OrdersPage().",
+      "frontend/src/components/OrderList.tsx::OrderList()."
+    ],
+    [
+      "frontend/src/main.tsx::<module-init>",
+      "frontend/src/pages/UserPage.tsx::UserPage()."
+    ],
+    [
+      "frontend/src/main.tsx::<module-init>",
+      "frontend/src/main.tsx::OrdersPage."
+    ]
   ],
   "dynamic": {
     "events": [
-      ["backend/src/services/orderService.ts::OrderService#place().", "backend/src/notifier.ts::sendReceipt()."],
-      ["backend/src/services/userService.ts::UserService#rename().", "backend/src/notifier.ts::audit()."]
+      [
+        "backend/src/services/orderService.ts::OrderService#place().",
+        "backend/src/notifier.ts::sendReceipt()."
+      ],
+      [
+        "backend/src/services/userService.ts::UserService#rename().",
+        "backend/src/notifier.ts::audit()."
+      ]
     ],
     "tables": [
-      ["backend/src/commands.ts::dispatch().", "backend/src/commands.ts::createUser()."],
-      ["backend/src/commands.ts::dispatch().", "backend/src/commands.ts::deleteUser()."],
-      ["backend/src/commands.ts::dispatchLoose().", "backend/src/commands.ts::createUser()."],
-      ["backend/src/commands.ts::dispatchLoose().", "backend/src/commands.ts::deleteUser()."]
+      [
+        "backend/src/commands.ts::dispatch().",
+        "backend/src/commands.ts::createUser()."
+      ],
+      [
+        "backend/src/commands.ts::dispatch().",
+        "backend/src/commands.ts::deleteUser()."
+      ],
+      [
+        "backend/src/commands.ts::dispatchLoose().",
+        "backend/src/commands.ts::createUser()."
+      ],
+      [
+        "backend/src/commands.ts::dispatchLoose().",
+        "backend/src/commands.ts::deleteUser()."
+      ]
     ],
     "frontendToBackend": [
-      ["frontend/src/api/contract.ts::getUserViaContract().", "backend/src/controllers/userController.ts::UserController#get."]
+      [
+        "frontend/src/api/contract.ts::getUserViaContract().",
+        "backend/src/controllers/userController.ts::UserController#get."
+      ]
     ]
-  }
+  },
+  "instantiates": [
+    [
+      "backend/src/services/userService.ts::UserService#findById().",
+      "backend/src/errors.ts::NotFound#"
+    ],
+    [
+      "backend/src/index.ts::<module-init>",
+      "backend/src/controllers/userController.ts::UserController#"
+    ],
+    [
+      "backend/src/index.ts::<module-init>",
+      "backend/src/controllers/orderController.ts::OrderController#"
+    ],
+    [
+      "backend/src/index.ts::<module-init>",
+      "backend/src/services/userService.ts::UserService#"
+    ],
+    [
+      "backend/src/index.ts::<module-init>",
+      "backend/src/services/orderService.ts::OrderService#"
+    ],
+    [
+      "backend/src/index.ts::<module-init>",
+      "backend/src/repositories/userRepository.ts::UserRepository#"
+    ],
+    [
+      "tests/userService.test.ts::<module-init>",
+      "backend/src/services/userService.ts::UserService#"
+    ]
+  ]
 }

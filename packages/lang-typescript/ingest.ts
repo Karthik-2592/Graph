@@ -3,7 +3,7 @@
 import { fromBinary } from "@bufbuild/protobuf";
 import { IndexSchema } from "@scip-code/scip";
 import { readFileSync } from "node:fs";
-import { parse, normalize, isNoise, isLocal } from "./symbols.ts";
+import { parse, normalize, isNoise, isLocal, TEST_GLOBALS } from "./symbols.ts";
 import { fileId, symbolId } from "../core/ids.ts";
 import type { NodeRow, EdgeRow } from "../core/store.ts";
 
@@ -11,12 +11,16 @@ function rng(r: readonly number[]): [number, number, number, number] {
   return r.length === 3 ? [r[0], r[1], r[0], r[2]] : [r[0], r[1], r[2], r[3]];
 }
 function contains(o: readonly number[], i: readonly number[]): boolean {
-  return o[0] <= i[0] && o[1] <= i[1] && i[2] <= o[2] && i[3] <= o[3];
+  // Lexicographic (startLine,startCol) / (endLine,endCol) — matches evaluate.py.
+  const startOk = o[0] < i[0] || (o[0] === i[0] && o[1] <= i[1]);
+  const endOk = o[2] > i[2] || (o[2] === i[2] && i[3] <= o[3]);
+  return startOk && endOk;
 }
 
 export type IngestResult = { nodes: NodeRow[]; edges: EdgeRow[]; documents: number };
 
-export function ingestScip(file: string, opts: { roleAt?: (line: string, col: number) => string } = {}): IngestResult {
+/** roleAt callback: (file, line, col) -> kind. Without it, everything is `calls`. */
+export function ingestScip(file: string, opts: { roleAt?: (file: string, line: number, col: number) => string; refineScopes?: (file: string) => { start: number; end: number; nodeId: string }[] } = {}): IngestResult {
   const index = fromBinary(IndexSchema, readFileSync(file));
   const defsite = new Map<string, string>();
   const encl = new Map<string, [readonly number[], string][]>();
@@ -42,6 +46,11 @@ export function ingestScip(file: string, opts: { roleAt?: (line: string, col: nu
       } else occs.push([f, rng(o.range), o.symbol]);
     }
   }
+  const refined = new Map<string, { start: number; end: number; nodeId: string }[]>();
+  if (opts.refineScopes) {
+    const fs = new Set([...encl.keys(), ...occs.map(([f]) => f)]);
+    for (const f of fs) refined.set(f, opts.refineScopes(f));
+  }
   const edgesByKey = new Map<string, EdgeRow>();
   const add = (src: string, dst: string, kind: string) => {
     const k = `${src}\0${dst}\0${kind}`;
@@ -52,12 +61,22 @@ export function ingestScip(file: string, opts: { roleAt?: (line: string, col: nu
   for (const [f, r, sym] of occs) {
     const target = defsite.get(sym);
     if (!target) continue;
-    // Smallest enclosing definition (refined scopes from Task 07 plug in here).
+    if (TEST_GLOBALS.has(target.split("::")[1] ?? "")) continue; // test globals (it/expect/...) are not graph edges
+    // Variable targets (`userService.`, `store.`) are references, never instantiations.
+    if (/^[a-z_][\w$]*\.$/.test(target.split("::")[1] ?? "")) continue;
+    // Refined scopes (line ranges) take precedence over SCIP enclosing ranges:
+    // occurrences inside an arrow property or top-level code belong to it,
+    // not to the enclosing class/file.
     let best: [readonly number[], string] | null = null;
     for (const [er, cid] of encl.get(f) ?? []) if (contains(er, r) && (!best || contains(best[0], er))) best = [er, cid];
+    const span = (refined.get(f) ?? []).find((s) => r[0] >= s.start && r[0] <= s.end);
+    if (span) best = [[span.start, 0, span.end, 9999], span.nodeId];
     if (!best || best[1] === target) continue;
-    const role = opts.roleAt?.("", r[1]) ?? "calls";
-    add(best[1], target, role === "new" || target.endsWith("#") ? "instantiates" : role === "jsx" ? "renders" : role === "reference" ? "references" : "calls");
+    const role = opts.roleAt?.(f, r[0], r[1]) ?? "calls";
+    // Field/property accesses and type positions are references, not calls —
+    // without roleAt we cannot tell, so Task 07 wiring removes these false edges.
+    if (role === "reference" || role === "type" || role === "decorator") { add(best[1], target, "references"); continue; }
+    add(best[1], target, role === "new" || target.endsWith("#") ? "instantiates" : role === "jsx" ? "renders" : "calls");
   }
   return { nodes: [...nodesById.values()], edges: [...edgesByKey.values()], documents: index.documents.length };
 }

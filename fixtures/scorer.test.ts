@@ -9,7 +9,7 @@ const truth = JSON.parse(readFileSync(new URL("./truth/shop.json", import.meta.u
 function assert(cond: boolean, msg: string) { if (!cond) { console.error("FAIL:", msg); process.exit(1); } }
 
 // 1. Perfect extraction => 100% everywhere, 0 false edges
-const perfect: Extracted = { calls: truth.calls, renders: truth.renders, dynamic: truth.dynamic };
+const perfect: Extracted = { calls: truth.calls, renders: truth.renders, instantiates: truth.instantiates ?? [], dynamic: truth.dynamic };
 const ok = score(truth, perfect);
 for (const [k, s] of Object.entries(ok)) assert(s.precision === 1 && s.recall === 1 && s.extra.length === 0, `${k} perfect score`);
 console.log("perfect:", formatReport(ok));

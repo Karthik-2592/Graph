@@ -10,12 +10,16 @@ export function normalize(descriptor: string): string {
   // Strip constructor marker, then strip parameter lists: `NotFound#(id)` -> `NotFound#`,
   // `findById().` stays `findById().`, `isAuthed().(req)` -> `isAuthed().`
   let d = descriptor.replace("`<constructor>`().", "").replace("`<constructor>`", "");
-  d = d.replace(/\([^()]*\)(?=\.|$)/g, "()");
+  // `NotFound#(id)` -> `NotFound#` (trailing param list removed);
+  // `findById().` keeps the marker `()`; `isAuthed().(req)` -> `isAuthed().`
+  d = d.replace(/\((?:[^()]*)\)(?=\.)/g, (m) => (m === "()" ? m : "()")); // normalize params to ()
+  d = d.replace(/\([^()]*\)$/, ""); // trailing param list with no descriptor terminator
   return d;
 }
 export function isExternal(symbol: string): boolean {
   return /node_modules|npm\/|external/i.test(symbol) || symbol.includes("`node_modules");
 }
+export const TEST_GLOBALS = new Set(["it.", "expect.", "describe.", "test."]);
 export function isNoise(symbol: string): boolean {
   return /lib\.(?:es|dom)|typescript\.d\.ts|@types\//i.test(symbol) && !symbol.includes("src/");
 }
