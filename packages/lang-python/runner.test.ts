@@ -5,7 +5,7 @@ function assert(c: boolean, m: string) { if (!c) { console.error("FAIL:", m); pr
 // Static check only (no scip-python binary required): runner module loads,
 // plugin contract holds, and the requests.scip golden parses via symbols.
 import { parse } from "./symbols.ts";
-const p = parse("scip-python pip requests 2.0 `src/models.py`/Request#send().");
-assert(p?.file === "src/models.py", "golden symbol parses");
+const p = parse("scip-python pip requests 2.0 `requests.models`/PreparedRequest#send().");
+assert(p?.file === "requests/models.py", "golden symbol parses (module-named)");
 console.log("runner.test: all passed (binary run is manual: scip-python index)");
 void runPythonIndexer;
