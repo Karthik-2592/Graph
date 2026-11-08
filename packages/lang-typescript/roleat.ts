@@ -55,6 +55,19 @@ export function refineScopes(source: SourceFile, fileId: string): ScopeSpan[] {
       }
     }
   }
+  // C1: arrow/function expressions assigned to const/let (incl. exports)
+  // are named scopes — calls inside them credit them, not module-init.
+  for (const stmt of source.getStatements()) {
+    if (!Node.isVariableStatement(stmt)) continue;
+    for (const decl of stmt.getDeclarations()) {
+      const nameNode = decl.getNameNode();
+      if (!Node.isIdentifier(nameNode)) continue;
+      const init = decl.getInitializer();
+      if (init && (Node.isArrowFunction(init) || Node.isFunctionExpression(init))) {
+        spans.push({ start: lineOf(decl.getStart()), end: lineOf(decl.getEnd()), nodeId: `${fileId}::${nameNode.getText()}.`, kind: "property-function" });
+      }
+    }
+  }
   // Top-level executable statements (not class/function declarations,
   // whose bodies have their own SCIP enclosing ranges) → module-init.
   // Each such statement gets its own span so methods inside classes are untouched.
