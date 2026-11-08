@@ -28,8 +28,10 @@ the machine: no accounts, no uploads, no API keys.
   call flow — both projections of one graph, with provenance per edge.
 - **Interactive canvas**: hierarchical folding, ELK layout, level toggle,
   call-flow mode (entry point + depth), coverage panel, blast radius.
-- **Lenient/strict dial**: index anything and report unresolved sites
-  (`graph check --strict` fails on gates G1–G8 for rule-compliant repos).
+- **Lenient/strict dial**: index anything and report unresolved sites.
+  Gates are tri-state (`ok` / `fail` / `not-evaluated`); in strict mode a
+  gate that could not be evaluated fails unless `--allow-unevaluated`
+  is passed. `graph check --strict` fails on gates G1–G8.
 - **Extractors**: event buses, shared route contracts, and handler tables
   become first-class `event`/`route` nodes — dynamic links SCIP alone misses.
 - **Category rail**: files grouped by framework-convention roles, with an
@@ -69,10 +71,21 @@ graph doctor                               # Node, indexer, deps, root program
 
 Legacy parser scripts still work: `npm run parse|insights|map-counts`.
 
+## Status
+
+| Area | State |
+|---|---|
+| L1 file graph (parser) | ✅ shipped, tested (41-edge parity) |
+| L2 call flow (SCIP + roleAt) | ✅ library + fixture-perfect (28/6/7); CLI/app wiring in progress |
+| Viewer (ELK canvas, coverage, flow, L1/L2 tabs) | ✅ shipped; L2 tab needs wired pipeline for real data |
+| Strict gates | ⚠️ tri-state implemented; site producers partial (G2 only) |
+| Python / Go | ⚠️ skeletons; Python yields no function edges yet |
+| Incremental indexing | ⚠️ helper exists, unwired |
+
 ## Development
 
 ```bash
-npm test          # fixture scorer + all package tests
+npm test          # every *.test.ts outside fixtures/ (scorer + packages)
 ```
 
 Fixtures (`fixtures/shop`, `shop-strict`, `shop-dynamic`) are generated
