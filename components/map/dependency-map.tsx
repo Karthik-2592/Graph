@@ -87,7 +87,17 @@ function MapCanvas({
   onDeselect,
 }: MapControl) {
   const view = useMemo(() => buildView(files, edges, folding, open), [files, edges, folding, open]);
-  const boxes = useMemo(() => layout(view.objects, view.edges), [view]);
+  // Dagre gives an instant layout; ELK (Task 12: wins at scale) upgrades it
+  // asynchronously. Until ELK resolves — or if it times out — dagre stands.
+  const dagreBoxes = useMemo(() => layout(view.objects, view.edges), [view]);
+  const [elkBoxes, setElkBoxes] = useState<Map<string, { x: number; y: number; width: number; height: number }> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setElkBoxes(null);
+    import("./elk-layout").then(({ layoutElk }) => layoutElk(view.objects, view.edges).then((b) => { if (!cancelled) setElkBoxes(b); }).catch(() => { /* dagre fallback stands */ }));
+    return () => { cancelled = true; };
+  }, [view]);
+  const boxes = elkBoxes ?? dagreBoxes;
   const lit = useMemo(() => highlightFor(view, edges, selection), [view, edges, selection]);
   const hovered = useMemo(() => hoverEndpoint(view, hover), [view, hover]);
   const railKeys = useMemo(
