@@ -21,7 +21,7 @@ export function runPipeline(opts: {
   const imp = opts.importNodes(opts.root);
   let scip: { nodes: Parameters<typeof upsertNodes>[2]; edges: Parameters<typeof upsertEdges>[2]; sites: Parameters<typeof insertSites>[2] } | null = null;
   try { scip = opts.scipNodes?.(opts.root) ?? null; } catch { scip = null; }
-  const producers: Record<string, string> = { "ts-imports": "ran", scip: scip ? "ran" : "failed", extractors: "skipped", profile: "skipped", declarations: "skipped", walk: "ran" };
+  const producers: Record<string, "ran" | "skipped" | "failed"> = { "ts-imports": "ran", scip: scip ? "ran" : "failed", extractors: "skipped", profile: "skipped", declarations: "skipped", walk: "ran" };
   transaction(db, () => {
     upsertNodes(db, runId, imp.nodes);
     upsertEdges(db, runId, imp.edges);

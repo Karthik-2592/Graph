@@ -1,5 +1,6 @@
 // F6: Python roleAt/refineScopes via tree-sitter WASM (F5 decision).
 // Queries: function definitions, lambdas, decorators, class bodies.
+// @ts-expect-error - web-tree-sitter ships no TS declarations for Node
 import { Parser, Language } from "web-tree-sitter";
 import path from "node:path";
 import type { Role } from "./symbols.ts";

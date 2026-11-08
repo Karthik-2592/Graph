@@ -53,7 +53,7 @@ export function main(argv: string[]): number {
       const strict = rest.includes("--strict");
       const ff = rest.find((a) => a.startsWith("--fail-on="))?.slice(10).split(",") ?? [];
       const { gates, failed } = checkGates(db, runId, { strict, failOn: ff });
-      for (const g of gates) console.log(`${g.ok ? "ok  " : "FAIL"} ${g.id}: ${g.detail}`);
+      for (const g of gates) console.log(`${g.state === "ok" ? "ok  " : g.state === "fail" ? "FAIL" : "ne  "} ${g.id}: ${g.detail}`);
       console.log(failed.length ? `failed: ${failed.join(",")}` : "all gates pass");
       return failed.length ? 1 : 0;
     }
