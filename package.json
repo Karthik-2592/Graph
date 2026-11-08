@@ -10,8 +10,9 @@
     "parse": "node scripts/parse.ts",
     "map-counts": "node scripts/map-counts.ts",
     "insights": "node scripts/insights.ts",
-    "test": "node fixtures/scorer.test.ts && node packages/core/core.test.ts",
-    "generate-fixtures": "node fixtures/generate.ts --strict"
+    "test": "node scripts/run-tests.mjs",
+    "generate-fixtures": "node fixtures/generate.ts --strict",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@bufbuild/protobuf": "2.17.0",

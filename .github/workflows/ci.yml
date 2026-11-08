@@ -1,0 +1,24 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  ci:
+    strategy:
+      matrix:
+        node: [22, 24]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+  big-indexers:
+    if: false # optional: enable with scip-python/scip-go installed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node packages/lang-python/runner.test.ts
