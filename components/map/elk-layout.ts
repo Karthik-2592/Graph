@@ -8,8 +8,12 @@ import { sizeOf, type Box } from "./layout.ts";
 type ElkInstance = any;
 
 async function getElk(): Promise<ElkInstance> {
-  const { default: Elk } = await import("elkjs");
-  return new Elk({ layered: { considerModelOrder: "PREFER_EDGE_LENGTH" } });
+  // elk.bundled (not the default entry): the default resolves `web-worker`,
+  // which Turbopack cannot bundle for the browser. Main-thread layout is
+  // fine for neighbourhood sizes; full-graph layout stays on the server CLI.
+  const mod = await import("elkjs/lib/elk.bundled.js");
+  const Elk = mod.default ?? mod;
+  return new Elk();
 }
 
 export async function layoutElk(objects: readonly MapObject[], edges: readonly MapEdge[], timeoutMs = 30000): Promise<Map<string, Box>> {
