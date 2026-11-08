@@ -1,12 +1,33 @@
 {
   "calls": [
-    ["src.ts::viaArrow.", "src.ts::helper()."],
-    ["src.ts::usesLocal.", "src.ts::local."],
-    ["src.ts::usesLocal.", "src.ts::viaArrow."],
-    ["src.ts::multiLine.", "src.ts::helper()."],
-    ["src.ts::K#run.", "src.ts::helper()."],
-    ["src.ts::K#m().", "src.ts::helper()."],
-    ["src.ts::viaFn().", "src.ts::helper()."]
+    [
+      "src.ts::viaArrow.",
+      "src.ts::helper()."
+    ],
+    [
+      "src.ts::usesLocal().",
+      "src.ts::local."
+    ],
+    [
+      "src.ts::usesLocal().",
+      "src.ts::viaArrow."
+    ],
+    [
+      "src.ts::multiLine.",
+      "src.ts::helper()."
+    ],
+    [
+      "src.ts::K#run.",
+      "src.ts::helper()."
+    ],
+    [
+      "src.ts::K#m().",
+      "src.ts::helper()."
+    ],
+    [
+      "src.ts::viaFn().",
+      "src.ts::helper()."
+    ]
   ],
   "renders": [],
   "instantiates": []

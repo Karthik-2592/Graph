@@ -20,7 +20,7 @@ function contains(o: readonly number[], i: readonly number[]): boolean {
 export type IngestResult = { nodes: NodeRow[]; edges: EdgeRow[]; documents: number };
 
 /** roleAt callback: (file, line, col) -> kind. Without it, everything is `calls`. */
-export function ingestScip(file: string, opts: { roleAt?: (file: string, line: number, col: number) => string; refineScopes?: (file: string) => { start: number; end: number; nodeId: string }[] } = {}): IngestResult {
+export function ingestScip(file: string, opts: { roleAt?: (file: string, line: number, col: number) => string; refineScopes?: (file: string) => { start: number; end: number; nodeId: string }[]; functionValued?: Set<string> } = {}): IngestResult {
   const index = fromBinary(IndexSchema, readFileSync(file));
   const defsite = new Map<string, string>();
   const encl = new Map<string, [readonly number[], string][]>();
@@ -62,8 +62,14 @@ export function ingestScip(file: string, opts: { roleAt?: (file: string, line: n
     const target = defsite.get(sym);
     if (!target) continue;
     if (TEST_GLOBALS.has(target.split("::")[1] ?? "")) continue; // test globals (it/expect/...) are not graph edges
-    // Variable targets (`userService.`, `store.`) are references, never instantiations.
-    if (/^[a-z_][\w$]*\.$/.test(target.split("::")[1] ?? "")) continue;
+    // Variable targets (`userService.`, `store.`) are references, never
+    // instantiations — but function-valued consts (arrow consts, C2) are
+    // call targets and must survive this filter.
+    const targetBase = target.split("::")[1] ?? "";
+    // C2: opts.functionValued lists arrow-const names (from AST); those
+    // targets are calls, other lowercase variables are references.
+    const isFnConst = (opts.functionValued ?? new Set<string>()).has(targetBase.replace(/\.$/, ""));
+    if (/^[a-z_][\w$]*\.$/.test(targetBase) && !isFnConst) continue;
     // Refined scopes (line ranges) take precedence over SCIP enclosing ranges:
     // occurrences inside an arrow property or top-level code belong to it,
     // not to the enclosing class/file.
@@ -75,7 +81,7 @@ export function ingestScip(file: string, opts: { roleAt?: (file: string, line: n
     const role = opts.roleAt?.(f, r[0], r[1]) ?? "calls";
     // Field/property accesses and type positions are references, not calls —
     // without roleAt we cannot tell, so Task 07 wiring removes these false edges.
-    if (role === "reference" || role === "type" || role === "decorator") { add(best[1], target, "references"); continue; }
+    if ((role === "reference" || role === "type" || role === "decorator") && !isFnConst) { add(best[1], target, "references"); continue; }
     add(best[1], target, role === "new" || target.endsWith("#") ? "instantiates" : role === "jsx" ? "renders" : "calls");
   }
   return { nodes: [...nodesById.values()], edges: [...edgesByKey.values()], documents: index.documents.length };
