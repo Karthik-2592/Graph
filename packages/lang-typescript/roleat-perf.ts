@@ -17,7 +17,10 @@ export function posFromLineCol(offsets: number[], line: number, col: number): nu
 
 /** Cheap pre-filter: can this target even be called/instantiated/rendered? */
 export function canBeCallTarget(descriptor: string): boolean {
-  return /\(\)\.$/#.test(descriptor) || /#$/.test(descriptor) || /^[A-Z]/.test(descriptor.split("#").pop() ?? "");
+  if (descriptor.endsWith("().")) return true;
+  if (descriptor.endsWith("#")) return true;
+  const last = descriptor.split("#").pop() ?? "";
+  return /^[A-Z]/.test(last);
 }
 
 export function roleAtIndexed(source: SourceFile, offsets: number[], line: number, col: number): Role {
